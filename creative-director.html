@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Creative Director — Disney Marketing</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0C0C10;--surface:#14141A;--surface2:#1C1C24;
+  --border:#26262E;--border2:#34343E;
+  --text:#F0EFE8;--muted:#7A7A86;--subtle:#4A4A54;
+  --gold:#C8A84B;--gold-l:rgba(200,168,75,.12);--gold-d:#96791A;
+  --red:#C41E3A;--red-l:rgba(196,30,58,.12);
+  --blue:#2A6EBB;--blue-l:rgba(42,110,187,.12);
+  --green:#2E7D4F;--green-l:rgba(46,125,79,.12);
+}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:15px;background:var(--bg);color:var(--text);overflow:hidden}
+
+/* ── WELCOME ──────────────────────────────────────────────── */
+#welcome{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;transition:opacity .4s,transform .4s;z-index:10;background:var(--bg)}
+#welcome.out{opacity:0;transform:translateY(-16px);pointer-events:none}
+
+.w-logo{display:flex;align-items:center;gap:10px;margin-bottom:44px}
+.w-badge{background:var(--gold);color:#0C0C10;font-weight:800;font-size:11px;padding:4px 10px;border-radius:6px;letter-spacing:.8px;text-transform:uppercase}
+.w-name{font-size:15px;font-weight:400;color:var(--muted);letter-spacing:.2px}
+
+.w-greeting{font-size:30px;font-weight:600;color:var(--text);text-align:center;margin-bottom:6px;letter-spacing:-.5px}
+.w-sub{font-size:16px;color:var(--muted);text-align:center;margin-bottom:32px;font-weight:300}
+
+.w-input-wrap{
+  width:100%;max-width:600px;background:var(--surface);
+  border:1px solid var(--border2);border-radius:14px;
+  display:flex;align-items:flex-end;padding:12px 14px;gap:10px;
+  transition:border-color .2s,box-shadow .2s;margin-bottom:16px;
+  box-shadow:0 1px 6px rgba(0,0,0,.4)
+}
+.w-input-wrap:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,168,75,.15)}
+#w-input{flex:1;border:none;outline:none;font-size:15px;font-family:inherit;color:var(--text);background:transparent;resize:none;max-height:160px;line-height:1.5;padding:2px 0}
+#w-input::placeholder{color:var(--subtle)}
+.w-send{width:34px;height:34px;border-radius:8px;background:var(--gold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:flex-end;transition:background .15s}
+.w-send:hover{background:var(--gold-d)}
+.w-send svg{fill:none;stroke:#0C0C10;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.w-pills{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:600px;margin-bottom:44px}
+.w-pill{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border2);border-radius:24px;padding:8px 16px;cursor:pointer;font-size:13px;color:var(--muted);transition:all .15s;white-space:nowrap}
+.w-pill:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-l)}
+
+.w-footer{font-size:12px;color:var(--subtle);display:flex;align-items:center;gap:14px}
+.w-footer-link{color:var(--subtle);cursor:pointer;transition:color .15s}
+.w-footer-link:hover{color:var(--muted)}
+.w-active{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.w-active-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── CHAT ─────────────────────────────────────────────────── */
+#chat{position:fixed;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .35s;background:var(--bg)}
+#chat.in{opacity:1;pointer-events:all}
+
+.chat-bar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.cb-logo{display:flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none}
+.cb-badge{background:var(--gold);color:#0C0C10;font-weight:800;font-size:10px;padding:2px 8px;border-radius:4px;letter-spacing:.6px}
+.cb-name{font-size:13px;font-weight:400;color:var(--muted)}
+.cb-title{font-size:11px;color:var(--subtle);margin-left:4px}
+.cb-right{margin-left:auto;display:flex;gap:7px;align-items:center}
+.cb-btn{background:transparent;border:1px solid var(--border2);color:var(--muted);font-size:11px;padding:5px 11px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;font-family:inherit}
+.cb-btn:hover{border-color:var(--gold);color:var(--gold)}
+.cb-count{background:var(--gold);color:#0C0C10;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px}
+
+.messages{flex:1;overflow-y:auto;padding:28px 16px;display:flex;flex-direction:column;gap:14px}
+.msg-outer{display:flex;justify-content:center}
+.msg-inner{width:100%;max-width:700px}
+.msg-row{display:flex;gap:12px;align-items:flex-end}
+.msg-row.user{flex-direction:row-reverse}
+.av{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:9px;letter-spacing:.3px}
+.av.bot{background:var(--gold);color:#0C0C10}
+.av.user{background:var(--surface2);color:var(--muted);border:1px solid var(--border2)}
+.bubble{padding:11px 15px;border-radius:18px;line-height:1.6;font-size:14px;max-width:520px}
+.bubble.bot{background:var(--surface);border:1px solid var(--border2);border-bottom-left-radius:4px;color:var(--text)}
+.bubble.user{background:var(--surface2);border:1px solid var(--border2);border-bottom-right-radius:4px;color:var(--text)}
+
+.typing-outer{display:flex;justify-content:center}
+.typing-inner{width:100%;max-width:700px}
+.typing-row{display:flex;gap:12px;align-items:flex-end}
+.typing-bub{background:var(--surface);border:1px solid var(--border2);border-radius:18px;border-bottom-left-radius:4px;padding:13px 16px;display:flex;gap:4px}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--subtle);animation:bonce 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes bonce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+
+.chip-outer{display:flex;justify-content:center}
+.chip-inner{width:100%;max-width:700px;padding-left:40px}
+.chip-row{display:flex;flex-wrap:wrap;gap:7px}
+.chip{background:var(--surface);border:1px solid var(--border2);color:var(--muted);border-radius:20px;padding:5px 13px;font-size:12px;cursor:pointer;transition:all .12s;white-space:nowrap;font-family:inherit}
+.chip:hover{border-color:var(--gold);color:var(--gold)}
+
+/* CREATIVE OUTPUT CARDS */
+.card-outer{display:flex;justify-content:center}
+.card-inner{width:100%;max-width:700px;padding-left:40px}
+.out-card{background:var(--surface);border:1px solid var(--border2);border-radius:12px;overflow:hidden;max-width:560px}
+.out-card-hdr{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.out-card-hdr-left{flex:1}
+.out-card-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:3px}
+.out-card-title{font-size:14px;font-weight:600;color:var(--text)}
+.out-card-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.out-card-body{padding:0}
+
+/* Platform cards inside concepting */
+.platform{border-bottom:1px solid var(--border);padding:14px 16px}
+.platform:last-child{border:none}
+.plat-num{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--subtle);margin-bottom:3px}
+.plat-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;letter-spacing:-.2px}
+.plat-tag{font-size:12px;color:var(--gold);font-style:italic;margin-bottom:8px}
+.plat-desc{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:6px}
+.plat-pill{display:inline-block;background:var(--surface2);border:1px solid var(--border2);color:var(--subtle);font-size:10px;padding:2px 8px;border-radius:4px;margin-right:5px;margin-top:3px}
+
+/* Copy options */
+.copy-section{padding:12px 16px;border-bottom:1px solid var(--border)}
+.copy-section:last-child{border:none}
+.copy-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--subtle);margin-bottom:8px}
+.copy-item{padding:7px 10px;border:1px solid var(--border2);border-radius:6px;margin-bottom:5px;font-size:13px;color:var(--text);background:var(--surface2);cursor:pointer;transition:border-color .12s}
+.copy-item:hover{border-color:var(--gold)}
+.copy-item:last-child{margin:0}
+.copy-rank{font-size:10px;color:var(--gold);float:right;margin-top:2px}
+
+/* Trailer treatment */
+.act{padding:12px 16px;border-bottom:1px solid var(--border)}
+.act:last-child{border:none}
+.act-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.act-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--subtle)}
+.act-time{font-size:10px;color:var(--gold);margin-left:auto}
+.act-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.act-desc{font-size:12px;color:var(--muted);line-height:1.6}
+.act-vo{font-size:12px;color:var(--text);font-style:italic;border-left:2px solid var(--gold);padding-left:10px;margin:6px 0}
+
+/* Brief sections */
+.brief-section{padding:12px 16px;border-bottom:1px solid var(--border)}
+.brief-section:last-child{border:none}
+.brief-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--subtle);margin-bottom:5px}
+.brief-content{font-size:12px;color:var(--muted);line-height:1.6}
+.brief-highlight{color:var(--text);font-weight:500}
+
+/* Output actions */
+.out-actions{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--surface2)}
+.out-btn-p{background:var(--gold);color:#0C0C10;border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.out-btn-p:hover{background:var(--gold-d)}
+.out-btn-s{background:transparent;color:var(--muted);border:1px solid var(--border2);border-radius:7px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s}
+.out-btn-s:hover{border-color:var(--gold);color:var(--gold)}
+
+/* BOTTOM INPUT */
+.chat-input-bar{border-top:1px solid var(--border);padding:14px 16px;background:var(--surface);flex-shrink:0;display:flex;justify-content:center}
+.chat-input-inner{width:100%;max-width:700px}
+.chat-input-wrap{background:var(--surface2);border:1px solid var(--border2);border-radius:14px;display:flex;align-items:flex-end;padding:10px 12px;gap:9px;transition:border-color .2s,box-shadow .2s}
+.chat-input-wrap:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,168,75,.1)}
+#chat-input{flex:1;border:none;outline:none;font-size:14px;font-family:inherit;color:var(--text);background:transparent;resize:none;max-height:110px;line-height:1.5;padding:2px 0}
+#chat-input::placeholder{color:var(--subtle)}
+#chat-input:disabled{opacity:.5;cursor:not-allowed}
+#send-btn{width:32px;height:32px;border-radius:8px;background:var(--gold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:flex-end;transition:background .15s}
+#send-btn:hover{background:var(--gold-d)}
+#send-btn:disabled{opacity:.35;cursor:not-allowed}
+#send-btn svg{fill:none;stroke:#0C0C10;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chat-hint{text-align:center;font-size:11px;color:var(--subtle);margin-top:6px}
+
+/* LIBRARY PANEL */
+.lib-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:none}
+.lib-overlay.open{display:block}
+.lib-panel{position:fixed;top:0;right:0;bottom:0;width:540px;background:var(--surface);z-index:301;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);border-left:1px solid var(--border)}
+.lib-panel.open{transform:translateX(0)}
+.lib-hdr{background:var(--surface2);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.lib-title{font-size:14px;font-weight:600;flex:1;color:var(--text)}
+.lib-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1}
+.lib-close:hover{color:var(--text)}
+.lib-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.lib-tab{padding:10px 16px;font-size:12px;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.lib-tab.on{color:var(--gold);border-bottom-color:var(--gold);font-weight:600}
+.lib-body{flex:1;overflow-y:auto;padding:16px}
+.lib-sec{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--subtle);margin-bottom:8px}
+.lib-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:7px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:border-color .12s}
+.lib-item:hover{border-color:var(--gold)}
+.lib-ico{width:32px;height:32px;border-radius:7px;background:var(--gold-l);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.lib-title-sm{font-size:12px;font-weight:600;color:var(--text)}
+.lib-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.lib-new{background:var(--gold-l);color:var(--gold);font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;border:1px solid rgba(200,168,75,.3)}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat-c{background:var(--surface2);border-radius:8px;padding:11px;text-align:center;border:1px solid var(--border)}
+.stat-v{font-size:20px;font-weight:700;color:var(--gold)}
+.stat-l{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* TITLE SWITCHER */
+.title-switcher{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:400;display:none;align-items:center;justify-content:center}
+.title-switcher.open{display:flex}
+.ts-modal{background:var(--surface);border:1px solid var(--border2);border-radius:14px;width:520px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden}
+.ts-hdr{background:var(--surface2);padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.ts-title{font-size:14px;font-weight:600;flex:1;color:var(--text)}
+.ts-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer}
+.ts-body{overflow-y:auto;padding:14px}
+.ts-year{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--subtle);margin:10px 0 6px}
+.ts-film{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .12s}
+.ts-film:hover{background:var(--surface2)}
+.ts-film.active{background:var(--gold-l)}
+.ts-date{font-size:10px;color:var(--subtle);width:60px;flex-shrink:0}
+.ts-studio{font-size:9px;color:var(--subtle);width:60px;flex-shrink:0}
+.ts-name{font-size:13px;font-weight:500;color:var(--text);flex:1}
+.ts-active-badge{background:var(--gold);color:#0C0C10;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px}
+
+/* scrollbars */
+.messages::-webkit-scrollbar,.lib-body::-webkit-scrollbar,.ts-body::-webkit-scrollbar{width:3px}
+.messages::-webkit-scrollbar-thumb,.lib-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- ══ WELCOME ══════════════════════════════════════════════ -->
+<div id="welcome">
+  <div class="w-logo">
+    <span class="w-badge">CD</span>
+    <span class="w-name">Creative Director &nbsp;·&nbsp; Disney Marketing</span>
+  </div>
+
+  <div class="w-greeting">Good morning, Michael.</div>
+  <div class="w-sub">What are we creating today?</div>
+
+  <div class="w-input-wrap">
+    <textarea id="w-input" rows="1" placeholder="Describe a creative challenge…" autocomplete="off"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();startChat(this.value)}"
+      oninput="autoW(this)"></textarea>
+    <button class="w-send" onclick="startChat(document.getElementById('w-input').value)">
+      <svg width="15" height="15" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+
+  <div class="w-pills">
+    <button class="w-pill" onclick="startChat('Develop campaign concepts')">🎯 Concepting</button>
+    <button class="w-pill" onclick="startChat('Write copy')">✍️ Copywriting</button>
+    <button class="w-pill" onclick="startChat('Build a creative brief')">📋 Presentation</button>
+    <button class="w-pill" onclick="startChat('Brief a trailer')">🎬 Trailer & AV</button>
+    <button class="w-pill" onclick="openTitles()">🎞️ Switch title</button>
+  </div>
+
+  <div class="w-footer">
+    <div class="w-active"><div class="w-active-dot"></div><span id="w-active-title">Avengers: Doomsday · December 18, 2026</span></div>
+    <span style="color:var(--border2)">·</span>
+    <span class="w-footer-link" onclick="openLibrary('overview')">Library <span id="w-lib-count" style="color:var(--gold);font-weight:600"></span></span>
+  </div>
+</div>
+
+<!-- ══ CHAT ══════════════════════════════════════════════════ -->
+<div id="chat">
+  <div class="chat-bar">
+    <a class="cb-logo" onclick="goHome()" href="#">
+      <span class="cb-badge">CD</span>
+      <span class="cb-name">Creative Director</span>
+    </a>
+    <span class="cb-title" id="cb-active-title">· Avengers: Doomsday</span>
+    <div class="cb-right">
+      <button class="cb-btn" onclick="openTitles()">Switch title</button>
+      <button class="cb-btn" onclick="openLibrary('overview')">Library <span class="cb-count" id="cb-count"></span></button>
+      <button class="cb-btn" onclick="newConv()">+ New</button>
+    </div>
+  </div>
+
+  <div class="messages" id="messages"></div>
+
+  <div class="chat-input-bar">
+    <div class="chat-input-inner">
+      <div class="chat-input-wrap">
+        <textarea id="chat-input" rows="1" placeholder="Message Creative Director…"
+          onkeydown="handleKey(event)" oninput="autosize(this)"></textarea>
+        <button id="send-btn" onclick="sendMsg()">
+          <svg width="15" height="15" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+      <div class="chat-hint">Creative Director · Disney Marketing · Confidential</div>
+    </div>
+  </div>
+</div>
+
+<!-- LIBRARY PANEL -->
+<div class="lib-overlay" id="lib-overlay" onclick="closeLibrary()"></div>
+<div class="lib-panel" id="lib-panel">
+  <div class="lib-hdr"><span style="font-size:16px">📁</span><span class="lib-title">Creative Library</span><button class="lib-close" onclick="closeLibrary()">&#x2715;</button></div>
+  <div class="lib-tabs">
+    <div class="lib-tab on" onclick="libTab('all',this)">All</div>
+    <div class="lib-tab" onclick="libTab('concepting',this)">Concepting</div>
+    <div class="lib-tab" onclick="libTab('copywriting',this)">Copywriting</div>
+    <div class="lib-tab" onclick="libTab('presentation',this)">Presentations</div>
+    <div class="lib-tab" onclick="libTab('trailer',this)">Trailer & AV</div>
+  </div>
+  <div class="lib-body" id="lib-body"></div>
+</div>
+
+<!-- TITLE SWITCHER -->
+<div class="title-switcher" id="ts-modal">
+  <div class="ts-modal">
+    <div class="ts-hdr"><span class="ts-title">Disney Marketing — Active Slate</span><button class="ts-close" onclick="closeTitles()">&#x2715;</button></div>
+    <div class="ts-body" id="ts-body"></div>
+  </div>
+</div>
+
+<script>
+// ── SLATE DATA ────────────────────────────────────────────────
+const SLATE = [
+  {year:'2026',films:[
+    {date:'5/22/26',studio:'Disney',title:'Star Wars: The Mandalorian and Grogu'},
+    {date:'6/19/26',studio:'Disney',title:'Toy Story 5'},
+    {date:'7/10/26',studio:'Disney',title:'Moana'},
+    {date:'9/11/26',studio:'Disney',title:'Untitled Oasis Documentary'},
+    {date:'9/25/26',studio:'Disney',title:'Avengers: Endgame (Re-Release)'},
+    {date:'11/25/26',studio:'Disney',title:"Disney's Hexed"},
+    {date:'12/18/26',studio:'Disney',title:'Avengers: Doomsday',active:true},
+  ]},
+  {year:'2027',films:[
+    {date:'2/5/27',studio:'20th',title:'Ice Age: Boiling Point'},
+    {date:'2/19/27',studio:'Disney',title:'Star Wars: A New Hope (50th Anniversary)'},
+    {date:'3/5/27',studio:'Disney',title:'Gatto'},
+    {date:'5/28/27',studio:'Disney',title:'Star Wars: Starfighter'},
+    {date:'8/6/27',studio:'Disney',title:'Untitled Bluey Movie'},
+    {date:'11/24/27',studio:'Disney',title:'Frozen 3'},
+    {date:'12/17/27',studio:'Disney',title:'Avengers: Secret Wars'},
+  ]},
+  {year:'2028',films:[
+    {date:'5/26/28',studio:'Disney',title:'Lilo & Stitch 2'},
+    {date:'6/16/28',studio:'Disney',title:'Incredibles 3'},
+  ]},
+];
+
+let activeTitle = 'Avengers: Doomsday';
+let activeRelease = 'December 18, 2026';
+
+// ── LIBRARY ────────────────────────────────────────────────────
+const LIBRARY = {outputs:[],
+  log(type,title,film){
+    const e={type,title,film:film||activeTitle,at:new Date().toLocaleTimeString(),ts:new Date().toLocaleString(),isNew:true};
+    this.outputs.unshift(e);
+    if(this.outputs.length>100)this.outputs.pop();
+    this.save();updateCounts();
+    return e;
+  },
+  init(){this.outputs=JSON.parse(localStorage.getItem('cd_lib')||'[]');},
+  save(){localStorage.setItem('cd_lib',JSON.stringify(this.outputs));}
+};
+
+function updateCounts(){
+  const n=LIBRARY.outputs.length;
+  ['w-lib-count','cb-count'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=n||'';});
+}
+
+// ── PAGE STATE ─────────────────────────────────────────────────
+let inChat=false;
+function startChat(text){if(!text.trim())return;enterChat();document.getElementById('w-input').value='';setTimeout(()=>{userMsg(text);setE(false);showTyping();setTimeout(()=>{hideTyping();setE(true);respond(text);},600);},320);}
+function enterChat(){if(inChat)return;inChat=true;document.getElementById('welcome').classList.add('out');document.getElementById('chat').classList.add('in');setTimeout(()=>document.getElementById('chat-input').focus(),400);}
+function goHome(){inChat=false;state='idle';flowIndex=0;ctx={};document.getElementById('messages').innerHTML='';document.getElementById('welcome').classList.remove('out');document.getElementById('chat').classList.remove('in');document.getElementById('w-input').value='';setTimeout(()=>document.getElementById('w-input').focus(),400);}
+function newConv(){document.getElementById('messages').innerHTML='';state='idle';flowIndex=0;ctx={};}
+
+// ── TITLE SWITCHER ─────────────────────────────────────────────
+function openTitles(){
+  const body=document.getElementById('ts-body');
+  let html='';
+  SLATE.forEach(yr=>{
+    html+=`<div class="ts-year">${yr.year}</div>`;
+    yr.films.forEach(f=>{
+      html+=`<div class="ts-film${f.active?' active':''}" onclick="selectTitle('${f.title.replace(/'/g,"\\'")}','${f.date}')">
+        <span class="ts-date">${f.date}</span>
+        <span class="ts-studio">${f.studio}</span>
+        <span class="ts-name">${f.title}</span>
+        ${f.active?'<span class="ts-active-badge">ACTIVE</span>':''}
+      </div>`;
+    });
+  });
+  body.innerHTML=html;
+  document.getElementById('ts-modal').classList.add('open');
+}
+function closeTitles(){document.getElementById('ts-modal').classList.remove('open');}
+function selectTitle(title,date){
+  activeTitle=title;
+  const d=date.replace(/(\d+)\/(\d+)\/(\d+)/,(_,m,day,yr)=>{const months=['January','February','March','April','May','June','July','August','September','October','November','December'];return months[parseInt(m)-1]+' '+day+', 20'+yr;});
+  activeRelease=d;
+  document.getElementById('w-active-title').textContent=title+' · '+d;
+  document.getElementById('cb-active-title').textContent='· '+title;
+  closeTitles();
+}
+
+// ── LIBRARY PANEL ──────────────────────────────────────────────
+function openLibrary(tab){document.getElementById('lib-overlay').classList.add('open');document.getElementById('lib-panel').classList.add('open');libTab(tab,document.querySelector('.lib-tab'));}
+function closeLibrary(){document.getElementById('lib-overlay').classList.remove('open');document.getElementById('lib-panel').classList.remove('open');}
+function libTab(tab,el){
+  document.querySelectorAll('.lib-tab').forEach(t=>t.classList.remove('on'));if(el)el.classList.add('on');
+  const body=document.getElementById('lib-body');
+  const items=tab==='all'?LIBRARY.outputs:LIBRARY.outputs.filter(o=>o.type===tab);
+  if(!items.length){body.innerHTML=`<div style="text-align:center;padding:40px;color:var(--muted);font-size:12px">No creative outputs yet in this category.</div>`;return;}
+  const icons={concepting:'🎯',copywriting:'✍️',presentation:'📋',trailer:'🎬'};
+  body.innerHTML=`<div class="stat-grid">
+    <div class="stat-c"><div class="stat-v">${LIBRARY.outputs.length}</div><div class="stat-l">Total outputs</div></div>
+    <div class="stat-c"><div class="stat-v">${LIBRARY.outputs.filter(o=>o.type==='concepting').length}</div><div class="stat-l">Concepts</div></div>
+    <div class="stat-c"><div class="stat-v">${LIBRARY.outputs.filter(o=>o.type==='copywriting').length}</div><div class="stat-l">Copy</div></div>
+  </div>
+  <div class="lib-sec">${tab==='all'?'All outputs':tab}</div>
+  ${items.map(o=>`<div class="lib-item">
+    <div class="lib-ico">${icons[o.type]||'📄'}</div>
+    <div style="flex:1"><div class="lib-title-sm">${o.title} ${o.isNew?'<span class="lib-new">NEW</span>':''}</div><div class="lib-meta">${o.film} · ${o.at}</div></div>
+  </div>`).join('')}`;
+}
+
+// ── CHAT ENGINE ────────────────────────────────────────────────
+let state='idle',ctx={},flowIndex=0;
+
+const FLOWS = {
+  concepting:[
+    {key:'title_confirm',ask:()=>`Working on <strong>${activeTitle}</strong>?`,chips:()=>[activeTitle,'Different title','Yes, let\'s go']},
+    {key:'phase',ask:()=>"What campaign phase are we concepting for?",chips:["Teaser / announce","Full campaign launch","Awards season","Re-release or extension","360° campaign from scratch"]},
+    {key:'challenge',ask:()=>"What's your primary creative challenge?",chips:["Introduce a new character or villain","Differentiate from previous entries","Build global scale and ensemble","Create emotional anticipation","Position against competitive landscape"]},
+    {key:'tone',ask:()=>"Tone territory?",chips:["Epic / monumental","Unsettling / psychological","Nostalgic / emotional","Urgent / visceral","All of the above — show me range"]},
+    {key:'output',isOutput:true,outputType:'concepting'},
+  ],
+  copywriting:[
+    {key:'title_confirm',ask:()=>`Copying for <strong>${activeTitle}</strong>?`,chips:()=>[activeTitle,'Different title','Yes']},
+    {key:'format',ask:()=>"What format?",chips:["Taglines","One-sheet / poster headline","Trailer end card","Social launch copy","OOH / out of home","TV spot closing line","All of the above"]},
+    {key:'direction',ask:()=>"Any strategic direction or constraints?",chips:["Villain-forward","Hero-focused","World stakes","Nostalgic angle","Something unexpected","No constraints — show me range"]},
+    {key:'output',isOutput:true,outputType:'copywriting'},
+  ],
+  presentation:[
+    {key:'title_confirm',ask:()=>`Building a presentation for <strong>${activeTitle}</strong>?`,chips:()=>[activeTitle,'Different title','Yes']},
+    {key:'type',ask:()=>"What deliverable?",chips:["Full creative brief","Campaign strategy deck","One-page creative overview","Agency briefing document","Executive alignment deck"]},
+    {key:'audience',ask:()=>"Who's in the room?",chips:["Studio leadership / execs","Agency creative team","Media / distribution partners","Global marketing partners","Mixed — internal and external"]},
+    {key:'output',isOutput:true,outputType:'presentation'},
+  ],
+  trailer:[
+    {key:'title_confirm',ask:()=>`Briefing a trailer for <strong>${activeTitle}</strong>?`,chips:()=>[activeTitle,'Different title','Yes']},
+    {key:'format',ask:()=>"What type of cut?",chips:["Teaser (under 2 min)","Full theatrical trailer (2–2:30)","TV spot (60s)","TV spot (30s)","Digital / social cut","IMAX or premium format cut"]},
+    {key:'anchor',ask:()=>"What story beat anchors the cut?",chips:["Villain reveal / introduction","Hero assembly / reunion","World stakes / scale","Character emotion and sacrifice","A single iconic moment","All above — maximize impact"]},
+    {key:'music',ask:()=>"Music direction?",chips:["Orchestral / cinematic score","Electronic / synthetic tension","Silence-forward / minimal","Source music with twist","Commission-worthy original","Score reference: I'll describe it"]},
+    {key:'output',isOutput:true,outputType:'trailer'},
+  ],
+};
+
+function detectIntent(q){
+  const lq=q.toLowerCase();
+  if(/concept|idea|platform|campaign idea|creative direction/.test(lq))return'concepting';
+  if(/copy|tagline|headline|script|words|write|phrase/.test(lq))return'copywriting';
+  if(/brief|deck|presentation|slide|document|one.pager|strategy/.test(lq))return'presentation';
+  if(/trailer|edit|av|cut|tease|spot|reel|music|sound/.test(lq))return'trailer';
+  return null;
+}
+
+function respond(input){
+  const q=input.toLowerCase().trim();
+  if(/^(home|start over|restart|reset)$/.test(q)){goHome();return;}
+  if(state==='idle'||state==='done'){
+    const i=detectIntent(input);
+    if(!i){botMsg("Tell me more — are we concepting, writing copy, building a brief, or briefing a trailer?",["Concepting","Copywriting","Brief a trailer","Build a presentation"]);return;}
+    startFlow(i);return;
+  }
+  advanceFlow(input);
+}
+
+function startFlow(i){state=i+'.0';flowIndex=0;ctx={};const s=getStep();if(s){const c=typeof s.chips==='function'?s.chips():s.chips;botMsg(s.ask(),c||[]);}}
+function getStep(){const f=state.split('.')[0];return(FLOWS[f]||[])[flowIndex]||null;}
+function advanceFlow(input){
+  const f=state.split('.')[0];const steps=FLOWS[f];if(!steps)return;
+  const step=steps[flowIndex];if(!step)return;
+  ctx[step.key]=input;flowIndex++;
+  const next=steps[flowIndex];
+  if(!next||next.isOutput){generateOutput(next?.outputType||f);return;}
+  const ask=next.ask();const chips=typeof next.chips==='function'?next.chips():next.chips;
+  setTimeout(()=>botMsg(ask,chips||[]),550);
+}
+
+// ── CREATIVE OUTPUTS ───────────────────────────────────────────
+function generateOutput(type){
+  const title=activeTitle;
+  setTimeout(()=>{
+    botMsg(type==='concepting'?'Three platforms. Different angles, same intelligence:'
+          :type==='copywriting'?'Here\'s your copy suite. Click any line to copy it.'
+          :type==='presentation'?'Campaign brief generated. Ready to share or expand.'
+          :'Cut treatment drafted. Structured for your editor and composer.');
+
+    const card=buildOutputCard(type,title);
+    const wrap=document.createElement('div');wrap.className='card-outer';
+    const inner=document.createElement('div');inner.className='card-inner';inner.appendChild(card);
+    wrap.appendChild(inner);document.getElementById('messages').appendChild(wrap);scrollBot();
+
+    LIBRARY.log(type,outputTitle(type),title);
+    state='done';
+    setTimeout(()=>addChips(["Try a different angle","Adjust tone","Go deeper on one","Start something new"]),800);
+  },900);
+}
+
+function outputTitle(type){return{concepting:'Campaign Platforms',copywriting:'Copy Suite',presentation:'Creative Brief',trailer:'Cut Treatment'}[type]||'Creative Output';}
+
+function buildOutputCard(type,title){
+  const el=document.createElement('div');el.className='out-card';
+  if(type==='concepting')el.innerHTML=conceptingCard(title);
+  else if(type==='copywriting')el.innerHTML=copywritingCard(title);
+  else if(type==='presentation')el.innerHTML=presentationCard(title);
+  else if(type==='trailer')el.innerHTML=trailerCard(title);
+  return el;
+}
+
+function conceptingCard(title){
+  return `<div class="out-card-hdr">
+    <div class="out-card-hdr-left">
+      <div class="out-card-label">Campaign Concepting · ${title}</div>
+      <div class="out-card-title">Three Platforms</div>
+      <div class="out-card-sub">${activeRelease} · Phase: ${ctx.phase||'Full campaign'}</div>
+    </div>
+  </div>
+  <div class="out-card-body">
+    <div class="platform">
+      <div class="plat-num">Platform 01</div>
+      <div class="plat-name">THE RECKONING</div>
+      <div class="plat-tag">"Everything they built. His design."</div>
+      <div class="plat-desc">The culmination campaign. Twenty years of Marvel storytelling arrive at a singular moment of consequence. Doctor Doom isn't a new threat — he's the conclusion to a story they didn't know he was writing. Campaign tone: quiet inevitability before detonation.</div>
+      <div><span class="plat-pill">Monolithic visual language</span><span class="plat-pill">Doom's geometric system</span><span class="plat-pill">Gold & shadow palette</span></div>
+    </div>
+    <div class="platform">
+      <div class="plat-num">Platform 02</div>
+      <div class="plat-name">FEAR SOMETHING SMARTER</div>
+      <div class="plat-tag">"He didn't come to destroy your world. He came to improve it."</div>
+      <div class="plat-desc">Doctor Doom is the most intelligent villain in Marvel history. This campaign celebrates that. Not chaos, not destruction — strategic, inevitable dominion. The campaign makes audiences genuinely uncertain for the first time since the original Endgame. The threat isn't power. It's inevitability.</div>
+      <div><span class="plat-pill">Psychological tension</span><span class="plat-pill">Precision over spectacle</span><span class="plat-pill">Intellectual unease</span></div>
+    </div>
+    <div class="platform">
+      <div class="plat-num">Platform 03</div>
+      <div class="plat-name">ASSEMBLED TOO LATE</div>
+      <div class="plat-tag">"Every hero. One enemy. No guarantee."</div>
+      <div class="plat-desc">The ensemble play. Every hero from 18 years of Marvel storytelling, united against the one villain they never prepared for. The campaign honors the legacy while escalating the stakes beyond anything before. Leverages the Endgame re-release (Sep 25) as campaign chapter one — nostalgia as setup, Doomsday as reckoning.</div>
+      <div><span class="plat-pill">Roster scale</span><span class="plat-pill">Legacy vs. new threat</span><span class="plat-pill">Endgame re-release tie-in</span></div>
+    </div>
+  </div>
+  <div class="out-actions">
+    <button class="out-btn-p" onclick="saveOutput(this,'Concepts saved to Library.')">Save to Library</button>
+    <button class="out-btn-s" onclick="chipSend('Go deeper on Platform 1')">Go deeper</button>
+    <button class="out-btn-s" onclick="chipSend('Write copy for Platform 2')">Write copy for this</button>
+  </div>`;
+}
+
+function copywritingCard(title){
+  return `<div class="out-card-hdr">
+    <div class="out-card-hdr-left">
+      <div class="out-card-label">Copy Suite · ${title}</div>
+      <div class="out-card-title">${ctx.format||'Full copy suite'}</div>
+      <div class="out-card-sub">${activeRelease} · ${ctx.direction||'Full range'}</div>
+    </div>
+  </div>
+  <div class="out-card-body">
+    <div class="copy-section">
+      <div class="copy-label">Taglines</div>
+      <div class="copy-item" onclick="copyText(this,'A new world requires a new order.')">A new world requires a new order. <span class="copy-rank">★★★★★</span></div>
+      <div class="copy-item" onclick="copyText(this,'He didn\'t come to destroy your world. He came to improve it.')">He didn't come to destroy your world. He came to improve it. <span class="copy-rank">★★★★★</span></div>
+      <div class="copy-item" onclick="copyText(this,'Every king needs a kingdom. He chose yours.')">Every king needs a kingdom. He chose yours. <span class="copy-rank">★★★★</span></div>
+      <div class="copy-item" onclick="copyText(this,'The Avengers assembled. Doom prepared.')">The Avengers assembled. Doom prepared. <span class="copy-rank">★★★★</span></div>
+      <div class="copy-item" onclick="copyText(this,'They fought for a world he already owns.')">They fought for a world he already owns. <span class="copy-rank">★★★★</span></div>
+    </div>
+    <div class="copy-section">
+      <div class="copy-label">One-sheet / Poster headline</div>
+      <div class="copy-item" onclick="copyText(this,'DOOM IS INEVITABLE')">DOOM IS INEVITABLE</div>
+      <div class="copy-item" onclick="copyText(this,'THE WORLD\'S NEW KING')">THE WORLD'S NEW KING</div>
+    </div>
+    <div class="copy-section">
+      <div class="copy-label">Trailer end card</div>
+      <div class="copy-item" onclick="copyText(this,'AVENGERS: DOOMSDAY · ONLY IN THEATERS · DECEMBER 18')">AVENGERS: DOOMSDAY · ONLY IN THEATERS · DECEMBER 18</div>
+    </div>
+    <div class="copy-section">
+      <div class="copy-label">Social launch</div>
+      <div class="copy-item" onclick="copyText(this,'They\'ve faced gods, aliens, and time itself. Now meet the mind behind the end. #AvengersDomsday #December18')">They've faced gods, aliens, and time itself. Now meet the mind behind the end. #AvengersDoomsday #December18</div>
+    </div>
+    <div class="copy-section">
+      <div class="copy-label">TV spot closing line</div>
+      <div class="copy-item" onclick="copyText(this,'This December, meet the mind behind the end.')">This December, meet the mind behind the end.</div>
+    </div>
+  </div>
+  <div class="out-actions">
+    <button class="out-btn-p" onclick="saveOutput(this,'Copy saved to Library.')">Save to Library</button>
+    <button class="out-btn-s" onclick="chipSend('Refine the top tagline')">Refine top tagline</button>
+    <button class="out-btn-s" onclick="chipSend('Brief a trailer')">Brief a trailer</button>
+  </div>`;
+}
+
+function presentationCard(title){
+  return `<div class="out-card-hdr">
+    <div class="out-card-hdr-left">
+      <div class="out-card-label">${ctx.type||'Creative Brief'} · ${title}</div>
+      <div class="out-card-title">Campaign Creative Brief</div>
+      <div class="out-card-sub">${activeRelease} · Audience: ${ctx.audience||'Agency creative team'}</div>
+    </div>
+  </div>
+  <div class="out-card-body">
+    <div class="brief-section">
+      <div class="brief-label">The Challenge</div>
+      <div class="brief-content">After the Endgame re-release (Sep 25, 2026), audiences arrive at Doomsday primed with nostalgia and emotional investment. Our campaign must honor that investment while introducing Doctor Doom as a genuinely new kind of threat. Challenge: <span class="brief-highlight">make a third Avengers chapter feel inevitable, not repetitive.</span></div>
+    </div>
+    <div class="brief-section">
+      <div class="brief-label">The Audience</div>
+      <div class="brief-content"><span class="brief-highlight">Primary:</span> Marvel fans 18–34, globally, digitally native, franchise-loyal.<br><span class="brief-highlight">Secondary:</span> Families with children 8+ who entered through animated IP.<br><span class="brief-highlight">Tertiary:</span> Lapsed MCU fans who stepped away post-Endgame.</div>
+    </div>
+    <div class="brief-section">
+      <div class="brief-label">The Insight</div>
+      <div class="brief-content">After 18 years of saving the world, audiences don't fear failure — they expect the heroes to win. <span class="brief-highlight">Doctor Doom changes that calculus.</span> His threat isn't physical power. It's inevitability. For the first time since the original Endgame, the campaign must make audiences genuinely uncertain about the outcome.</div>
+    </div>
+    <div class="brief-section">
+      <div class="brief-label">The Idea</div>
+      <div class="brief-content"><span class="brief-highlight">"FEAR SOMETHING SMARTER"</span> — A campaign built on intellectual unease. Doom is the first MCU villain whose plan the audience can't predict. Not "will they survive?" — but "what world are they surviving into?"</div>
+    </div>
+    <div class="brief-section">
+      <div class="brief-label">Executional Territories</div>
+      <div class="brief-content">1. Global theatrical — Doom's visual system (geometric, gold/shadow)<br>2. Digital social — Character reveals, intel drops, countdown content<br>3. OOH — Architectural, monumental, Doom-centric<br>4. Cross-promotional — Endgame re-release as campaign chapter one</div>
+    </div>
+    <div class="brief-section">
+      <div class="brief-label">The Ask</div>
+      <div class="brief-content">Develop 3 distinct creative platforms that demonstrate the range of "FEAR SOMETHING SMARTER" across paid, owned, and earned media. Deliver concepts, visual references, and executional roadmap by end of Q3 2026.</div>
+    </div>
+  </div>
+  <div class="out-actions">
+    <button class="out-btn-p" onclick="saveOutput(this,'Brief saved to Library.')">Save to Library</button>
+    <button class="out-btn-s" onclick="chipSend('Develop campaign concepts')">Now concept this</button>
+    <button class="out-btn-s" onclick="chipSend('Brief a trailer')">Brief a trailer</button>
+  </div>`;
+}
+
+function trailerCard(title){
+  return `<div class="out-card-hdr">
+    <div class="out-card-hdr-left">
+      <div class="out-card-label">Trailer Treatment · ${title}</div>
+      <div class="out-card-title">${ctx.format||'Teaser'} — "THE DESIGN"</div>
+      <div class="out-card-sub">${activeRelease} · Runtime: 1:48 · Tone: ${ctx.anchor||'Villain reveal'}</div>
+    </div>
+  </div>
+  <div class="out-card-body">
+    <div class="act">
+      <div class="act-header"><div class="act-label">Open</div><div class="act-time">0:00–0:06</div></div>
+      <div class="act-desc">Black. Complete silence. The Avengers theme begins — but wrong. Slowed. Distorted. Like a recording heard through a wall. A single geometric shape materializes: Doom's insignia. Precise. Patient.</div>
+    </div>
+    <div class="act">
+      <div class="act-header"><div class="act-label">Act I — What Was</div><div class="act-time">0:06–0:35</div></div>
+      <div class="act-title">The Cost</div>
+      <div class="act-desc">Rapid montage of MCU history. Not action — aftermath. Quiet celebrations. The world the Avengers built. Each image brief, warm, nostalgic. Then: Doom's insignia overlaid on each frame. As if it was always there. As if the whole history was already claimed.</div>
+    </div>
+    <div class="act">
+      <div class="act-header"><div class="act-label">Act II — The Architect</div><div class="act-time">0:35–1:15</div></div>
+      <div class="act-title">Doom speaks. No image yet.</div>
+      <div class="act-vo">"You've spent twenty years protecting a world I was always going to inherit."</div>
+      <div class="act-desc">First image of Doom: not dramatic — seated. Reviewing something. Relaxed. The most terrifying thing in the frame is his calm. Hero reaction shots. Not fear — uncertainty. They don't know the play.</div>
+      <div class="act-vo">"The Avengers were magnificent. A useful distraction."</div>
+    </div>
+    <div class="act">
+      <div class="act-header"><div class="act-label">Act III — The Scale</div><div class="act-time">1:15–1:42</div></div>
+      <div class="act-title">Assembled. Wasn't enough.</div>
+      <div class="act-desc">Music swells — orchestral tension, synthetic drone underneath. The full roster assembles. More heroes than any previous film. The scope is overwhelming. Then: Doom stands. Single title card: <strong>ASSEMBLED.</strong> Cut to black. One beat. Then: <strong>WASN'T ENOUGH.</strong></div>
+    </div>
+    <div class="act">
+      <div class="act-header"><div class="act-label">End Card</div><div class="act-time">1:42–1:48</div></div>
+      <div class="act-desc"><strong>AVENGERS: DOOMSDAY · ONLY IN THEATERS · DECEMBER 18</strong></div>
+    </div>
+    <div class="act" style="background:rgba(200,168,75,.06)">
+      <div class="act-header"><div class="act-label">Music Direction</div></div>
+      <div class="act-desc"><span class="brief-highlight">Commission-worthy, not library.</span> Post-Endgame orchestral DNA combined with something colder and more mechanical. Reference: Oppenheimer score meets The Substance's use of silence. The Avengers theme returns in the final 10 seconds — full, triumphant, then cut off by Doom's motif.</div>
+    </div>
+  </div>
+  <div class="out-actions">
+    <button class="out-btn-p" onclick="saveOutput(this,'Treatment saved to Library.')">Save to Library</button>
+    <button class="out-btn-s" onclick="chipSend('Write copy for the trailer end card')">Write end card copy</button>
+    <button class="out-btn-s" onclick="chipSend('Brief the 30 second TV spot')">Brief TV spot</button>
+  </div>`;
+}
+
+function copyText(el,text){
+  navigator.clipboard.writeText(text).then(()=>{const orig=el.style.borderColor;el.style.borderColor='var(--gold)';setTimeout(()=>el.style.borderColor=orig,1000);}).catch(()=>{});}
+function saveOutput(btn,msg){btn.textContent='✓ Saved';btn.style.background='var(--green)';btn.disabled=true;setTimeout(()=>botMsg(msg+' <button onclick="openLibrary(\'all\')" style="background:none;border:none;color:var(--gold);cursor:pointer;font-size:12px;text-decoration:underline">View library →</button>',[]),400);}
+
+// ── RENDER ─────────────────────────────────────────────────────
+function showTyping(){removeChips();const m=document.getElementById('messages');const o=document.createElement('div');o.className='typing-outer';const i=document.createElement('div');i.className='typing-inner';const r=document.createElement('div');r.className='typing-row';r.id='typing';r.innerHTML=`<div class="av bot">CD</div><div class="typing-bub"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;i.appendChild(r);o.appendChild(i);m.appendChild(o);scrollBot();}
+function hideTyping(){const e=document.getElementById('typing');if(e&&e.parentElement&&e.parentElement.parentElement)e.parentElement.parentElement.remove();}
+function removeChips(){document.querySelectorAll('.chip-outer').forEach(e=>e.remove());}
+
+function botMsg(html,chips){
+  if(html===null)return;hideTyping();const m=document.getElementById('messages');
+  const o=document.createElement('div');o.className='msg-outer';const i=document.createElement('div');i.className='msg-inner';
+  const r=document.createElement('div');r.className='msg-row';r.innerHTML=`<div class="av bot">CD</div><div class="bubble bot">${html}</div>`;i.appendChild(r);
+  if(chips&&chips.length){const co=document.createElement('div');co.className='chip-outer';const ci=document.createElement('div');ci.className='chip-inner';const cr=document.createElement('div');cr.className='chip-row';chips.forEach(c=>{const b=document.createElement('button');b.className='chip';b.textContent=c;b.onclick=()=>chipSend(c);cr.appendChild(b);});ci.appendChild(cr);co.appendChild(ci);i.appendChild(co);}
+  o.appendChild(i);m.appendChild(o);scrollBot();
+}
+function addChips(chips){const co=document.createElement('div');co.className='chip-outer';const ci=document.createElement('div');ci.className='chip-inner';const cr=document.createElement('div');cr.className='chip-row';chips.forEach(c=>{const b=document.createElement('button');b.className='chip';b.textContent=c;b.onclick=()=>chipSend(c);cr.appendChild(b);});ci.appendChild(cr);co.appendChild(ci);document.getElementById('messages').appendChild(co);scrollBot();}
+function userMsg(t){removeChips();const m=document.getElementById('messages');const o=document.createElement('div');o.className='msg-outer';const i=document.createElement('div');i.className='msg-inner';const r=document.createElement('div');r.className='msg-row user';r.innerHTML=`<div class="av user">MI</div><div class="bubble user">${t}</div>`;i.appendChild(r);o.appendChild(i);m.appendChild(o);scrollBot();}
+function chipSend(t){userMsg(t);setE(false);showTyping();setTimeout(()=>{hideTyping();setE(true);respond(t);document.getElementById('chat-input').focus();},500);}
+function sendMsg(){const i=document.getElementById('chat-input');const t=i.value.trim();if(!t)return;enterChat();userMsg(t);i.value='';i.style.height='';setE(false);showTyping();setTimeout(()=>{hideTyping();setE(true);respond(t);i.focus();},580);}
+function setE(on){document.getElementById('chat-input').disabled=!on;document.getElementById('send-btn').disabled=!on;}
+function scrollBot(){const m=document.getElementById('messages');setTimeout(()=>m.scrollTop=m.scrollHeight,50);}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function autosize(el){el.style.height='';el.style.height=Math.min(el.scrollHeight,110)+'px';}
+function autoW(el){el.style.height='';el.style.height=Math.min(el.scrollHeight,140)+'px';}
+
+// ── INIT ───────────────────────────────────────────────────────
+LIBRARY.init();updateCounts();
+document.getElementById('w-input').focus();
+</script>
+</body>
+</html>
